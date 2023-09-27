@@ -6,5 +6,6 @@ const authorization = require('../middlewares/authorization');
 const router = Router();
 
 router.post('/', authorization, validate.create, controller.create);
+router.get('/', authorization, controller.findAll);
 
 module.exports = router;

@@ -6,6 +6,12 @@ async function create(req, res) {
   handleResponse(res, result);
 }
 
+async function findAll(req, res) {
+  const result = await userService.findAll();
+  handleResponse(res, result);
+}
+
 module.exports = {
   create,
+  findAll,
 };

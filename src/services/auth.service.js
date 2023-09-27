@@ -1,5 +1,5 @@
 const { User } = require('../models');
-const { BAD_REQUEST, OK } = require('../utils/codes');
+const { BAD_REQUEST, OK, UNAUTHORIZED } = require('../utils/codes');
 const tokenize = require('../utils/token');
 
 async function login({ email, password }) {
@@ -12,6 +12,13 @@ async function login({ email, password }) {
   return { code: OK, data: { token } };
 }
 
+async function validateToken(token) {
+  const result = tokenize.decode(token);
+  if (!result) {
+    return { code: UNAUTHORIZED, data: { message: 'Expired or invalid token' } };
+  }
+}
 module.exports = {
   login,
+  validateToken,
 };

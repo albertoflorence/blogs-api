@@ -1,5 +1,5 @@
 const { User } = require('../models');
-const { CONFLICT, CREATED } = require('../utils/codes');
+const { CONFLICT, CREATED, OK } = require('../utils/codes');
 const tokenize = require('../utils/token');
 
 async function create({ email, displayName, password }) {
@@ -12,6 +12,12 @@ async function create({ email, displayName, password }) {
   return { code: CREATED, data: { token } };
 }
 
+async function findAll() {
+  const users = await User.findAll({ attributes: { exclude: ['password'] } });
+  return { code: OK, data: users };
+}
+
 module.exports = {
   create,
+  findAll,
 };

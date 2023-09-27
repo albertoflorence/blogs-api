@@ -1,5 +1,5 @@
 const { User } = require('../models');
-const { CONFLICT, CREATED, OK } = require('../utils/codes');
+const { CONFLICT, CREATED, OK, NOT_FOUND } = require('../utils/codes');
 const tokenize = require('../utils/token');
 
 async function create({ email, displayName, password }) {
@@ -17,7 +17,16 @@ async function findAll() {
   return { code: OK, data: users };
 }
 
+async function findOne({ id }) {
+  const user = await User.findByPk(id, { attributes: { exclude: ['password'] } });
+  if (!user) {
+    return { code: NOT_FOUND, data: { message: 'User does not exist' } };
+  }
+  return { code: OK, data: user };
+}
+
 module.exports = {
   create,
   findAll,
+  findOne,
 };

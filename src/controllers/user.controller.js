@@ -10,8 +10,13 @@ async function findAll(req, res) {
   const result = await userService.findAll();
   handleResponse(res, result);
 }
+async function findOne(req, res) {
+  const result = await userService.findOne(req.params);
+  handleResponse(res, result);
+}
 
 module.exports = {
   create,
   findAll,
+  findOne,
 };

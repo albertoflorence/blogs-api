@@ -8,7 +8,7 @@ async function login({ email, password }) {
     return { code: BAD_REQUEST, data: { message: 'Invalid fields' } };
   }
 
-  const token = tokenize.generate({ user });
+  const token = tokenize.generate({ userId: user.id });
   return { code: OK, data: { token } };
 }
 

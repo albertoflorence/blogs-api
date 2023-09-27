@@ -4,8 +4,8 @@
  */
 
 const model = (sequelize, DataTypes) => {
-  const UserModel = sequelize.define(
-    'User',
+  const BlogPost = sequelize.define(
+    'BlogPost',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -13,33 +13,37 @@ const model = (sequelize, DataTypes) => {
         autoIncrement: true,
         allowNull: false,
       },
-      displayName: {
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      title: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      password: {
+      content: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      email: {
-        type: DataTypes.STRING,
-        unique: true,
+      published: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
-      image: {
-        type: DataTypes.STRING,
+      updated: {
+        type: DataTypes.DATE,
       },
     },
-    { timestamps: false, tableName: 'users', underscored: true },
+    { timestamps: false, tableName: 'blog_posts', underscored: true },
   );
 
-  UserModel.associate = ({ BlogPost }) => {
-    UserModel.hasMany(BlogPost, {
+  BlogPost.associate = ({ User }) => {
+    BlogPost.belongsTo(User, {
       foreignKey: 'userId',
-      as: 'blogPosts',
+      as: 'user',
     });
   };
 
-  return UserModel;
+  return BlogPost;
 };
 
 module.exports = model;

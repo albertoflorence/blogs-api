@@ -1,5 +1,5 @@
 const { User } = require('../models');
-const { CONFLICT, CREATED, OK, NOT_FOUND } = require('../utils/codes');
+const { CONFLICT, CREATED, OK, NOT_FOUND, NO_CONTENT } = require('../utils/codes');
 const tokenize = require('../utils/token');
 
 async function create({ email, displayName, password }) {
@@ -25,8 +25,15 @@ async function findOne({ id }) {
   return { code: OK, data: user };
 }
 
+async function deleteOne({ userId }) {
+  const user = await User.findByPk(userId);
+  await user.destroy();
+  return { code: NO_CONTENT };
+}
+
 module.exports = {
   create,
   findAll,
   findOne,
+  deleteOne,
 };

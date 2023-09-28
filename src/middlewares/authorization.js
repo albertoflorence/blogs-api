@@ -10,12 +10,14 @@ async function auth(req, res, next) {
   const authResult = await authService.validateToken(authorization.split(' ')[1]);
   if (authResult.code !== 200) return handleResponse(res, authResult);
 
-  const authorizationResult = await authorizationService.user({
-    ...authResult.data,
-    id: req.params.id,
-    route: req.baseUrl,
-  });
-  if (authorizationResult.code !== 200) return handleResponse(res, authorizationResult);
+  if (req.params.id) {
+    const authorizationResult = await authorizationService.user({
+      ...authResult.data,
+      id: req.params.id,
+      route: req.baseUrl,
+    });
+    if (authorizationResult.code !== 200) return handleResponse(res, authorizationResult);
+  }
 
   req.locals = authResult.data;
   next();

@@ -16,8 +16,14 @@ async function findOne(req, res) {
   return handleResponse(res, result);
 }
 
+async function update(req, res) {
+  const result = await blogPostService.update({ ...req.params, ...req.body, ...req.locals });
+  return handleResponse(res, result);
+}
+
 module.exports = {
   create,
   findAll,
   findOne,
+  update,
 };

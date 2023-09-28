@@ -1,15 +1,16 @@
 const joi = require('joi');
 const handleValidate = require('../utils/handleValidate');
 
-const schema = joi.object({
-  title: joi.string().required(),
-  content: joi.string().required(),
-  categoryIds: joi.array().items(joi.number()).required(),
-}).messages({
+const title = joi.string().required();
+const content = joi.string().required();
+const categoryId = joi.array().items(joi.number()).required();
+
+const messages = {
   'any.required': 'Some required fields are missing',
   'string.empty': 'Some required fields are missing',
-});
+};
 
-const create = handleValidate(schema);
+const create = handleValidate(joi.object({ title, content, categoryId }).messages(messages));
+const update = handleValidate(joi.object({ title, content }).messages(messages));
 
-module.exports = { create };
+module.exports = { create, update };

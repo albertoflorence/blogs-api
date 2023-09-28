@@ -1,6 +1,24 @@
 const { Op } = require('sequelize');
 const { BlogPost, Category, sequelize, PostCategory, User } = require('../models');
-const { INTERNAL_ERROR, CREATED, NOT_FOUND, BAD_REQUEST, OK } = require('../utils/codes');
+const {
+  INTERNAL_ERROR,
+  CREATED,
+  NOT_FOUND,
+  BAD_REQUEST,
+  OK,
+  UNAUTHORIZED,
+} = require('../utils/codes');
+
+const includeUser = {
+  model: User,
+  as: 'user',
+  attributes: { exclude: ['password'] },
+};
+const includeCategories = {
+  model: Category,
+  as: 'categories',
+  through: { attributes: [] },
+};
 
 async function create({ title, content, categoryIds, userId }) {
   const categories = await Category.findAll({ where: { id: { [Op.in]: categoryIds } } });
@@ -25,36 +43,28 @@ async function create({ title, content, categoryIds, userId }) {
 async function findAll({ userId }) {
   const posts = await BlogPost.findAll({
     where: { userId },
-    include: [{
-      model: User,
-      as: 'user',
-      attributes: { exclude: ['password'] },
-    }, {
-      model: Category,
-      as: 'categories',
-      through: { attributes: [] },
-    }],
+    include: [includeUser, includeCategories],
   });
-
   return { code: OK, data: posts };
 }
 
 async function findOne({ id }) {
-  const post = await BlogPost.findByPk(id, {
-    include: [{
-      model: User,
-      as: 'user',
-      attributes: { exclude: ['password'] },
-    }, {
-      model: Category,
-      as: 'categories',
-      through: { attributes: [] },
-    }],
-  });
-
+  const post = await BlogPost.findByPk(id, { include: [includeUser, includeCategories] });
   if (!post) {
     return { code: NOT_FOUND, data: { message: 'Post does not exist' } };
   }
+  return { code: OK, data: post };
+}
+
+async function update({ id, title, content, userId }) {
+  const post = await BlogPost.findByPk(id, { include: [includeUser, includeCategories] });
+  if (post.userId !== userId) {
+    return { code: UNAUTHORIZED, data: { message: 'Unauthorized user' } };
+  }
+
+  post.title = title;
+  post.content = content;
+  await post.save();
 
   return { code: OK, data: post };
 }
@@ -63,4 +73,5 @@ module.exports = {
   create,
   findAll,
   findOne,
+  update,
 };

@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { BlogPost, Category, sequelize, PostCategory } = require('../models');
+const { BlogPost, Category, sequelize, PostCategory, User } = require('../models');
 const { INTERNAL_ERROR, CREATED } = require('../utils/codes');
 
 async function create({ title, content, categoryIds, userId }) {
@@ -22,6 +22,25 @@ async function create({ title, content, categoryIds, userId }) {
   }
 }
 
+async function findAll({ userId }) {
+  const posts = await BlogPost.findAll({
+    where: { userId },
+    include: [{
+      model: User,
+      as: 'user',
+      attributes: { exclude: ['password'] },
+    }, {
+      model: Category,
+      as: 'categories',
+      through: { attributes: [] },
+      attributes: ['id', 'name'],
+    }],
+  });
+
+  return { code: 200, data: posts };
+}
+
 module.exports = {
   create,
+  findAll,
 };

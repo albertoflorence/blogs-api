@@ -6,6 +6,11 @@ async function create(req, res) {
   return handleResponse(res, result);
 }
 
+async function findAll(req, res) {
+  const result = await blogPostService.findAll({ ...req.locals });
+  return handleResponse(res, result);
+}
 module.exports = {
   create,
+  findAll,
 };

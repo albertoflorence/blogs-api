@@ -1,11 +1,11 @@
 const { Op } = require('sequelize');
 const { BlogPost, Category, sequelize, PostCategory, User } = require('../models');
-const { INTERNAL_ERROR, CREATED } = require('../utils/codes');
+const { INTERNAL_ERROR, CREATED, NOT_FOUND, BAD_REQUEST, OK } = require('../utils/codes');
 
 async function create({ title, content, categoryIds, userId }) {
   const categories = await Category.findAll({ where: { id: { [Op.in]: categoryIds } } });
   if (categories.length !== categoryIds.length) {
-    return { code: 400, data: { message: 'one or more "categoryIds" not found' } };
+    return { code: BAD_REQUEST, data: { message: 'one or more "categoryIds" not found' } };
   }
   const transaction = await sequelize.transaction();
   try {
@@ -33,14 +33,34 @@ async function findAll({ userId }) {
       model: Category,
       as: 'categories',
       through: { attributes: [] },
-      attributes: ['id', 'name'],
     }],
   });
 
-  return { code: 200, data: posts };
+  return { code: OK, data: posts };
+}
+
+async function findOne({ id }) {
+  const post = await BlogPost.findByPk(id, {
+    include: [{
+      model: User,
+      as: 'user',
+      attributes: { exclude: ['password'] },
+    }, {
+      model: Category,
+      as: 'categories',
+      through: { attributes: [] },
+    }],
+  });
+
+  if (!post) {
+    return { code: NOT_FOUND, data: { message: 'Post does not exist' } };
+  }
+
+  return { code: OK, data: post };
 }
 
 module.exports = {
   create,
   findAll,
+  findOne,
 };

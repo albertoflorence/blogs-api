@@ -21,9 +21,15 @@ async function update(req, res) {
   return handleResponse(res, result);
 }
 
+async function deleteOne(req, res) {
+  const result = await blogPostService.deleteOne({ ...req.params, ...req.locals });
+  return handleResponse(res, result);
+}
+
 module.exports = {
   create,
   findAll,
   findOne,
   update,
+  deleteOne,
 };

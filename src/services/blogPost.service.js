@@ -6,7 +6,7 @@ const {
   NOT_FOUND,
   BAD_REQUEST,
   OK,
-  UNAUTHORIZED,
+  NO_CONTENT,
 } = require('../utils/codes');
 
 const includeUser = {
@@ -19,6 +19,7 @@ const includeCategories = {
   as: 'categories',
   through: { attributes: [] },
 };
+const postNoFound = { code: NOT_FOUND, data: { message: 'Post does not exist' } };
 
 async function create({ title, content, categoryIds, userId }) {
   const categories = await Category.findAll({ where: { id: { [Op.in]: categoryIds } } });
@@ -51,17 +52,13 @@ async function findAll({ userId }) {
 async function findOne({ id }) {
   const post = await BlogPost.findByPk(id, { include: [includeUser, includeCategories] });
   if (!post) {
-    return { code: NOT_FOUND, data: { message: 'Post does not exist' } };
+    return postNoFound;
   }
   return { code: OK, data: post };
 }
 
-async function update({ id, title, content, userId }) {
+async function update({ id, title, content }) {
   const post = await BlogPost.findByPk(id, { include: [includeUser, includeCategories] });
-  if (post.userId !== userId) {
-    return { code: UNAUTHORIZED, data: { message: 'Unauthorized user' } };
-  }
-
   post.title = title;
   post.content = content;
   await post.save();
@@ -69,9 +66,17 @@ async function update({ id, title, content, userId }) {
   return { code: OK, data: post };
 }
 
+async function deleteOne({ id }) {
+  const post = await BlogPost.findByPk(id);
+  if (!post) return postNoFound;
+  post.destroy();
+  return { code: NO_CONTENT };
+}
+
 module.exports = {
   create,
   findAll,
   findOne,
   update,
+  deleteOne,
 };

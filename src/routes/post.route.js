@@ -9,5 +9,6 @@ router.post('/', authorization, validate.create, controller.create);
 router.get('/', authorization, controller.findAll);
 router.get('/:id', authorization, controller.findOne);
 router.put('/:id', authorization, validate.update, controller.update);
+router.delete('/:id', authorization, controller.deleteOne);
 
 module.exports = router;

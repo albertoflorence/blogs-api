@@ -31,6 +31,7 @@ const migration = {
       },
       updated: {
         type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
       }
     }, { timestamps: false })
   },

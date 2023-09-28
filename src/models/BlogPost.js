@@ -15,7 +15,6 @@ const model = (sequelize, DataTypes) => {
       },
       userId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
       },
       title: {
         type: DataTypes.STRING,
@@ -31,6 +30,7 @@ const model = (sequelize, DataTypes) => {
       },
       updated: {
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
     },
     { timestamps: false, tableName: 'blog_posts', underscored: true },

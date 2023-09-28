@@ -17,6 +17,8 @@ async function validateToken(token) {
   if (!result) {
     return { code: UNAUTHORIZED, data: { message: 'Expired or invalid token' } };
   }
+
+  return { code: OK, data: { userId: result.userId } };
 }
 module.exports = {
   login,

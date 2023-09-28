@@ -19,7 +19,7 @@ const includeCategories = {
   as: 'categories',
   through: { attributes: [] },
 };
-const postNoFound = { code: NOT_FOUND, data: { message: 'Post does not exist' } };
+const postNotFound = { code: NOT_FOUND, data: { message: 'Post does not exist' } };
 
 async function create({ title, content, categoryIds, userId }) {
   const categories = await Category.findAll({ where: { id: { [Op.in]: categoryIds } } });
@@ -41,9 +41,13 @@ async function create({ title, content, categoryIds, userId }) {
   }
 }
 
-async function findAll({ userId }) {
+async function findAll({ userId, text }) {
+  const where = { userId };
+  if (text) {
+    where[Op.or] = { title: { [Op.like]: `%${text}%` }, content: { [Op.like]: `%${text}%` } };
+  }
   const posts = await BlogPost.findAll({
-    where: { userId },
+    where,
     include: [includeUser, includeCategories],
   });
   return { code: OK, data: posts };
@@ -52,7 +56,7 @@ async function findAll({ userId }) {
 async function findOne({ id }) {
   const post = await BlogPost.findByPk(id, { include: [includeUser, includeCategories] });
   if (!post) {
-    return postNoFound;
+    return postNotFound;
   }
   return { code: OK, data: post };
 }
@@ -68,7 +72,7 @@ async function update({ id, title, content }) {
 
 async function deleteOne({ id }) {
   const post = await BlogPost.findByPk(id);
-  if (!post) return postNoFound;
+  if (!post) return postNotFound;
   post.destroy();
   return { code: NO_CONTENT };
 }

@@ -7,7 +7,7 @@ async function create(req, res) {
 }
 
 async function findAll(req, res) {
-  const result = await blogPostService.findAll({ ...req.locals });
+  const result = await blogPostService.findAll({ ...req.locals, text: req.query.q });
   return handleResponse(res, result);
 }
 
